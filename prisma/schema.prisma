@@ -1,0 +1,402 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant architecture
+model Tenant {
+  id          String   @id @default(cuid())
+  name        String
+  industry    String
+  domain      String?  @unique
+  settings    Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       User[]
+  contacts    Contact[]
+  companies   Company[]
+  deals       Deal[]
+  activities  Activity[]
+  customFields CustomField[]
+  workflows   Workflow[]
+  integrations Integration[]
+  reports     Report[]
+  notifications Notification[]
+
+  @@map("tenants")
+}
+
+// User management with roles
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  firstName   String
+  lastName    String
+  avatar      String?
+  role        UserRole @default(USER)
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  contacts    Contact[]
+  deals       Deal[]
+  activities  Activity[]
+  reports     Report[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// Contact management with industry-specific fields
+model Contact {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  title       String?
+  avatar      String?
+  status      ContactStatus @default(LEAD)
+  source      String?
+  tags        String[] @default([])
+  customData  Json     @default("{}")
+  notes       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // User relation (assigned to)
+  assignedUserId String?
+  assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
+
+  // Company relation
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+
+  // Relations
+  deals       Deal[]
+  activities  Activity[]
+  customFields CustomFieldValue[]
+
+  @@map("contacts")
+}
+
+// Company management
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  website     String?
+  industry    String?
+  size        CompanySize?
+  description String?
+  logo        String?
+  address     Json?    @default("{}")
+  customData  Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  contacts    Contact[]
+  deals       Deal[]
+
+  @@map("companies")
+}
+
+// Deal/Pipeline management
+model Deal {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  value       Decimal  @db.Decimal(10, 2)
+  stage       String
+  probability Int      @default(0) // 0-100
+  closeDate   DateTime?
+  source      String?
+  tags        String[] @default([])
+  customData  Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // User relation (assigned to)
+  assignedUserId String?
+  assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
+
+  // Contact relation
+  contactId   String?
+  contact     Contact? @relation(fields: [contactId], references: [id])
+
+  // Company relation
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+
+  // Relations
+  activities  Activity[]
+
+  @@map("deals")
+}
+
+// Activity tracking
+model Activity {
+  id          String   @id @default(cuid())
+  type        ActivityType
+  title       String
+  description String?
+  dueDate     DateTime?
+  completedAt DateTime?
+  status      ActivityStatus @default(PENDING)
+  priority    Priority @default(MEDIUM)
+  customData  Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // User relation (assigned to)
+  assignedUserId String?
+  assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
+
+  // Contact relation
+  contactId   String?
+  contact     Contact? @relation(fields: [contactId], references: [id])
+
+  // Deal relation
+  dealId      String?
+  deal        Deal?    @relation(fields: [dealId], references: [id])
+
+  @@map("activities")
+}
+
+// Custom fields for industry-specific data
+model CustomField {
+  id          String   @id @default(cuid())
+  name        String
+  type        CustomFieldType
+  required    Boolean  @default(false)
+  options     String[] @default([])
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  values      CustomFieldValue[]
+
+  @@map("custom_fields")
+}
+
+// Custom field values
+model CustomFieldValue {
+  id          String   @id @default(cuid())
+  value       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Custom field relation
+  customFieldId String
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  // Contact relation
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, contactId])
+  @@map("custom_field_values")
+}
+
+// Workflow management
+model Workflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  industry    String
+  steps       Json     @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("workflows")
+}
+
+// Integration management
+model Integration {
+  id          String   @id @default(cuid())
+  name        String
+  type        IntegrationType
+  config      Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
+
+// Report management
+model Report {
+  id          String   @id @default(cuid())
+  name        String
+  type        ReportType
+  config      Json     @default("{}")
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // User relation (created by)
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  @@map("reports")
+}
+
+// Notification system
+model Notification {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean  @default(false)
+  data        Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  // Tenant relation
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // User relation
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  USER
+  VIEWER
+}
+
+enum ContactStatus {
+  LEAD
+  PROSPECT
+  CUSTOMER
+  INACTIVE
+}
+
+enum CompanySize {
+  STARTUP
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+enum ActivityType {
+  CALL
+  EMAIL
+  MEETING
+  TASK
+  NOTE
+  FOLLOW_UP
+}
+
+enum ActivityStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  EMAIL
+  PHONE
+  DATE
+  SELECT
+  MULTI_SELECT
+  CHECKBOX
+  TEXTAREA
+}
+
+enum IntegrationType {
+  EMAIL
+  CALENDAR
+  PHONE
+  SMS
+  WEBHOOK
+  API
+}
+
+enum ReportType {
+  CONTACTS
+  DEALS
+  ACTIVITIES
+  PERFORMANCE
+  CUSTOM
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  REMINDER
+}
