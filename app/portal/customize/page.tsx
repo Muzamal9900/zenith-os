@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { 
   Palette, 
   Upload, 
@@ -45,11 +46,16 @@ import {
 interface CustomizationSettings {
   branding: {
     companyName: string
+    tagline: string
     logo: string
     primaryColor: string
     secondaryColor: string
     accentColor: string
     fontFamily: string
+    brandPersonality: string
+    brandVoice: string
+    brandGuidelines: string
+    industry: string
   }
   industry: {
     type: string
@@ -82,11 +88,16 @@ export default function PortalCustomizePage() {
   const [settings, setSettings] = useState<CustomizationSettings>({
     branding: {
       companyName: "Your Company",
+      tagline: "",
       logo: "",
       primaryColor: "#8b5cf6",
       secondaryColor: "#06b6d4",
       accentColor: "#10b981",
-      fontFamily: "Inter"
+      fontFamily: "Inter",
+      brandPersonality: "",
+      brandVoice: "",
+      brandGuidelines: "",
+      industry: ""
     },
     industry: {
       type: "restoration",
@@ -119,7 +130,32 @@ export default function PortalCustomizePage() {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isBrandGuidelinesOpen, setIsBrandGuidelinesOpen] = useState(false)
+  const [aiGuidelines, setAiGuidelines] = useState<string>('')
+  const [isGeneratingGuidelines, setIsGeneratingGuidelines] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Load settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/customize')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success && result.data) {
+            setSettings(result.data)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadSettings()
+  }, [])
 
   const industries = [
     { id: "restoration", name: "Restoration", icon: "🏠", color: "from-red-500 to-pink-500" },
@@ -136,6 +172,28 @@ export default function PortalCustomizePage() {
     "Inter", "Roboto", "Open Sans", "Lato", "Montserrat", "Poppins", "Source Sans Pro", "Nunito"
   ]
 
+  // Color validation and normalization
+  const validateAndNormalizeColor = (color: string): string => {
+    if (!color) return "#000000"
+    
+    // Remove any whitespace
+    color = color.trim()
+    
+    // If it's a valid hex color, return it
+    if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)) {
+      return color.toUpperCase()
+    }
+    
+    // If it's a 3-digit hex, convert to 6-digit
+    if (/^#([A-Fa-f0-9]{3})$/.test(color)) {
+      const hex = color.slice(1)
+      return `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`.toUpperCase()
+    }
+    
+    // If it's not a valid hex, return the original value (let the user see the error)
+    return color
+  }
+
   const updateSetting = (path: string, value: any) => {
     setSettings(prev => {
       const newSettings = { ...prev }
@@ -146,6 +204,11 @@ export default function PortalCustomizePage() {
         current = current[keys[i]]
       }
       
+      // Normalize color values for color fields
+      if (keys.includes('primaryColor') || keys.includes('secondaryColor') || keys.includes('accentColor')) {
+        value = validateAndNormalizeColor(value)
+      }
+      
       current[keys[keys.length - 1]] = value
       setHasChanges(true)
       return newSettings
@@ -154,10 +217,33 @@ export default function PortalCustomizePage() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setHasChanges(false)
-    setIsSaving(false)
+    try {
+      const response = await fetch('/api/customize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save settings')
+      }
+
+      const result = await response.json()
+      if (result.success) {
+        setHasChanges(false)
+        // Optionally show success message
+        console.log('Settings saved successfully')
+      } else {
+        throw new Error(result.error || 'Failed to save settings')
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      // Optionally show error message to user
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +271,640 @@ export default function PortalCustomizePage() {
     const newFields = [...settings.industry.customFields]
     newFields[index] = { ...newFields[index], [field]: value }
     updateSetting('industry.customFields', newFields)
+  }
+
+  // Generate AI-powered brand guidelines
+  const generateAIGuidelines = async () => {
+    setIsGeneratingGuidelines(true)
+    try {
+      const response = await fetch('/api/generate-brand-guidelines', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: settings.branding.companyName,
+          tagline: settings.branding.tagline,
+          industry: settings.branding.industry,
+          brandVoice: settings.branding.brandVoice,
+          brandPersonality: settings.branding.brandPersonality,
+          brandGuidelines: settings.branding.brandGuidelines,
+          primaryColor: settings.branding.primaryColor,
+          secondaryColor: settings.branding.secondaryColor,
+          accentColor: settings.branding.accentColor,
+          fontFamily: settings.branding.fontFamily
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate guidelines')
+      }
+
+      const result = await response.json()
+      if (result.success) {
+        setAiGuidelines(result.guidelines)
+      } else {
+        throw new Error(result.error || 'Failed to generate guidelines')
+      }
+    } catch (error) {
+      console.error('Error generating AI guidelines:', error)
+      setAiGuidelines('Sorry, there was an error generating the brand guidelines. Please try again.')
+    } finally {
+      setIsGeneratingGuidelines(false)
+    }
+  }
+
+  // Brand Guidelines Modal Component
+  const BrandGuidelinesModal = () => (
+    <Dialog open={isBrandGuidelinesOpen} onOpenChange={setIsBrandGuidelinesOpen}>
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            <Palette className="w-6 h-6" />
+            Brand Guidelines
+          </DialogTitle>
+          <DialogDescription>
+            Complete brand identity and guidelines for {settings.branding.companyName || 'Your Company'}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-8">
+          {/* AI-Generated Brand Guidelines */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-xl border-2 border-indigo-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                AI-Generated Brand Guidelines
+              </h3>
+              <Button
+                onClick={generateAIGuidelines}
+                disabled={isGeneratingGuidelines}
+                className="flex items-center gap-2"
+              >
+                {isGeneratingGuidelines ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Activity className="w-4 h-4" />
+                    Generate Guidelines
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {aiGuidelines ? (
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="prose prose-sm max-w-none">
+                  <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                    {aiGuidelines}
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Activity className="w-4 h-4" />
+                    <span>Generated by AI based on your brand details</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white p-6 rounded-lg border border-gray-200 text-center">
+                <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Generate AI Brand Guidelines</h4>
+                <p className="text-gray-600 mb-4">
+                  Get comprehensive, professional brand guidelines tailored specifically to your company's identity, 
+                  industry, and brand personality.
+                </p>
+                <Button
+                  onClick={generateAIGuidelines}
+                  disabled={isGeneratingGuidelines}
+                  className="flex items-center gap-2 mx-auto"
+                >
+                  {isGeneratingGuidelines ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Generating Guidelines...
+                    </>
+                  ) : (
+                    <>
+                      <Activity className="w-4 h-4" />
+                      Generate AI Guidelines
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Company Identity */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Company Identity
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Company Name</h4>
+                <p className="text-gray-900 text-lg font-semibold">
+                  {settings.branding.companyName || 'Not specified'}
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Tagline</h4>
+                <p className="text-gray-600">
+                  {settings.branding.tagline || 'No tagline specified'}
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Industry</h4>
+                <Badge variant="secondary" className="capitalize">
+                  {settings.branding.industry || 'Not specified'}
+                </Badge>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Font Family</h4>
+                <p className="text-gray-600 font-mono">
+                  {settings.branding.fontFamily || 'Inter'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Brand Colors */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              Brand Color Palette
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div 
+                  className="w-20 h-20 rounded-xl mx-auto mb-3 shadow-lg border-2 border-white"
+                  style={{ backgroundColor: settings.branding.primaryColor }}
+                ></div>
+                <h4 className="font-medium text-gray-700 mb-1">Primary Color</h4>
+                <p className="text-sm text-gray-600 font-mono">{settings.branding.primaryColor}</p>
+                <p className="text-xs text-gray-500 mt-1">Buttons, links, primary actions</p>
+              </div>
+              <div className="text-center">
+                <div 
+                  className="w-20 h-20 rounded-xl mx-auto mb-3 shadow-lg border-2 border-white"
+                  style={{ backgroundColor: settings.branding.secondaryColor }}
+                ></div>
+                <h4 className="font-medium text-gray-700 mb-1">Secondary Color</h4>
+                <p className="text-sm text-gray-600 font-mono">{settings.branding.secondaryColor}</p>
+                <p className="text-xs text-gray-500 mt-1">Secondary actions, highlights</p>
+              </div>
+              <div className="text-center">
+                <div 
+                  className="w-20 h-20 rounded-xl mx-auto mb-3 shadow-lg border-2 border-white"
+                  style={{ backgroundColor: settings.branding.accentColor }}
+                ></div>
+                <h4 className="font-medium text-gray-700 mb-1">Accent Color</h4>
+                <p className="text-sm text-gray-600 font-mono">{settings.branding.accentColor}</p>
+                <p className="text-xs text-gray-500 mt-1">Success states, positive actions</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Brand Voice & Personality */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Brand Voice & Personality
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Brand Voice</h4>
+                <Badge variant="outline" className="capitalize">
+                  {settings.branding.brandVoice ? 
+                    settings.branding.brandVoice.replace(/([A-Z])/g, ' $1').trim() : 
+                    'Not specified'
+                  }
+                </Badge>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Brand Personality</h4>
+                <Badge variant="outline" className="capitalize">
+                  {settings.branding.brandPersonality || 'Not specified'}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Brand Guidelines */}
+          {settings.branding.brandGuidelines && (
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Brand Guidelines & Values
+              </h3>
+              <div className="prose prose-sm max-w-none">
+                <p className="text-gray-700 whitespace-pre-wrap">
+                  {settings.branding.brandGuidelines}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Logo Preview */}
+          {settings.branding.logo && (
+            <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Logo Preview
+              </h3>
+              <div className="flex items-center gap-4">
+                <img 
+                  src={settings.branding.logo} 
+                  alt="Company Logo" 
+                  className="w-24 h-24 object-contain bg-white rounded-lg shadow-sm border"
+                />
+                <div>
+                  <p className="text-sm text-gray-600">Current logo</p>
+                  <p className="text-xs text-gray-500">Uploaded and ready for use</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Usage Examples */}
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5" />
+              Usage Examples
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-3">Button Styles</h4>
+                <div className="space-y-2">
+                  <button 
+                    className="px-4 py-2 rounded-lg text-white font-medium"
+                    style={{ backgroundColor: settings.branding.primaryColor }}
+                  >
+                    Primary Button
+                  </button>
+                  <button 
+                    className="px-4 py-2 rounded-lg text-white font-medium"
+                    style={{ backgroundColor: settings.branding.secondaryColor }}
+                  >
+                    Secondary Button
+                  </button>
+                  <button 
+                    className="px-4 py-2 rounded-lg text-white font-medium"
+                    style={{ backgroundColor: settings.branding.accentColor }}
+                  >
+                    Accent Button
+                  </button>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-3">Text Styles</h4>
+                <div className="space-y-2">
+                  <h1 
+                    className="text-2xl font-bold"
+                    style={{ 
+                      color: settings.branding.primaryColor,
+                      fontFamily: settings.branding.fontFamily 
+                    }}
+                  >
+                    Heading Text
+                  </h1>
+                  <p 
+                    className="text-lg"
+                    style={{ fontFamily: settings.branding.fontFamily }}
+                  >
+                    Body text with brand font
+                  </p>
+                  <p 
+                    className="text-sm"
+                    style={{ color: settings.branding.secondaryColor }}
+                  >
+                    Secondary text color
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Media Branding Plan */}
+          <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              Social Media Branding Plan
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Tailored recommendations for {settings.branding.companyName || 'your company'} based on your brand identity
+            </p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Platform-Specific Recommendations */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-700 mb-3">Platform Recommendations</h4>
+                
+                {/* Instagram */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      IG
+                    </div>
+                    <h5 className="font-medium text-gray-900">Instagram</h5>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {settings.branding.brandPersonality === 'creative' ? 
+                      'Perfect for showcasing creative content and visual storytelling' :
+                      settings.branding.brandPersonality === 'friendly' ?
+                      'Great for building community and engaging with customers' :
+                      'Ideal for professional content and brand awareness'
+                    }
+                  </p>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {settings.branding.primaryColor}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {settings.branding.fontFamily}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* LinkedIn */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      LI
+                    </div>
+                    <h5 className="font-medium text-gray-900">LinkedIn</h5>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {settings.branding.brandVoice === 'professional' ? 
+                      'Excellent for B2B networking and professional content' :
+                      'Great for industry insights and thought leadership'
+                    }
+                  </p>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {settings.branding.secondaryColor}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      Professional
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Twitter/X */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      X
+                    </div>
+                    <h5 className="font-medium text-gray-900">Twitter/X</h5>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {settings.branding.brandVoice === 'innovative' ? 
+                      'Perfect for sharing industry trends and innovations' :
+                      'Great for real-time updates and customer service'
+                    }
+                  </p>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {settings.branding.accentColor}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      Quick Updates
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Strategy */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-700 mb-3">Content Strategy</h4>
+                
+                {/* Brand Voice Application */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h5 className="font-medium text-gray-900 mb-2">Brand Voice Guidelines</h5>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {settings.branding.brandVoice === 'professional' ? 
+                      'Use formal language, industry terminology, and data-driven content' :
+                      settings.branding.brandVoice === 'friendly' ?
+                      'Use conversational tone, emojis, and personal stories' :
+                      settings.branding.brandVoice === 'innovative' ?
+                      'Focus on cutting-edge topics, trends, and forward-thinking content' :
+                      'Maintain consistent, brand-appropriate messaging across all platforms'
+                    }
+                  </p>
+                  <div className="text-xs text-gray-500">
+                    Voice: <span className="font-medium capitalize">{settings.branding.brandVoice || 'Not specified'}</span>
+                  </div>
+                </div>
+
+                {/* Visual Guidelines */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h5 className="font-medium text-gray-900 mb-2">Visual Guidelines</h5>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded"
+                        style={{ backgroundColor: settings.branding.primaryColor }}
+                      ></div>
+                      <span className="text-sm text-gray-600">Primary: Headers, CTAs, highlights</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded"
+                        style={{ backgroundColor: settings.branding.secondaryColor }}
+                      ></div>
+                      <span className="text-sm text-gray-600">Secondary: Backgrounds, accents</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded"
+                        style={{ backgroundColor: settings.branding.accentColor }}
+                      ></div>
+                      <span className="text-sm text-gray-600">Accent: Success states, positive actions</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Industry-Specific Tips */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h5 className="font-medium text-gray-900 mb-2">Industry Tips</h5>
+                  <p className="text-sm text-gray-600">
+                    {settings.branding.industry === 'technology' ? 
+                      'Share tech insights, product updates, and industry news' :
+                      settings.branding.industry === 'healthcare' ?
+                      'Focus on patient care, medical advances, and health education' :
+                      settings.branding.industry === 'finance' ?
+                      'Share market insights, financial tips, and regulatory updates' :
+                      settings.branding.industry === 'education' ?
+                      'Highlight learning resources, student success, and educational trends' :
+                      'Share industry-specific content and thought leadership'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media Templates */}
+            <div className="mt-6">
+              <h4 className="font-medium text-gray-700 mb-4">Social Media Templates</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Instagram Post Template */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 opacity-20"
+                      style={{ backgroundColor: settings.branding.primaryColor }}
+                    ></div>
+                    <div className="relative z-10 text-center">
+                      <div 
+                        className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-xl"
+                        style={{ backgroundColor: settings.branding.primaryColor }}
+                      >
+                        {settings.branding.companyName[0]?.toUpperCase() || 'C'}
+                      </div>
+                      <p 
+                        className="text-sm font-medium"
+                        style={{ color: settings.branding.primaryColor }}
+                      >
+                        {settings.branding.companyName}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600">Instagram Post Template</p>
+                </div>
+
+                {/* LinkedIn Post Template */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="h-32 bg-gray-100 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 opacity-10"
+                      style={{ backgroundColor: settings.branding.secondaryColor }}
+                    ></div>
+                    <div className="relative z-10 text-center">
+                      <h3 
+                        className="text-lg font-bold mb-1"
+                        style={{ 
+                          color: settings.branding.primaryColor,
+                          fontFamily: settings.branding.fontFamily 
+                        }}
+                      >
+                        Professional Update
+                      </h3>
+                      <p className="text-sm text-gray-600">LinkedIn Post Template</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600">LinkedIn Post Template</p>
+                </div>
+
+                {/* Twitter/X Template */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <div className="h-32 bg-gray-100 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 opacity-10"
+                      style={{ backgroundColor: settings.branding.accentColor }}
+                    ></div>
+                    <div className="relative z-10 text-center">
+                      <p 
+                        className="text-sm font-medium mb-1"
+                        style={{ color: settings.branding.accentColor }}
+                      >
+                        Quick Update
+                      </p>
+                      <p className="text-xs text-gray-600">Twitter/X Template</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600">Twitter/X Template</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Items */}
+            <div className="mt-6 bg-white p-4 rounded-lg border border-gray-200">
+              <h4 className="font-medium text-gray-900 mb-3">Next Steps</h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-gray-600">Create social media accounts with consistent branding</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-gray-600">Develop content calendar based on brand voice</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-gray-600">Use brand colors consistently across all platforms</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span className="text-sm text-gray-600">Engage with industry-relevant content and hashtags</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Export Options */}
+          <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Download className="w-5 h-5" />
+              Export & Share
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  const brandData = {
+                    companyName: settings.branding.companyName,
+                    tagline: settings.branding.tagline,
+                    colors: {
+                      primary: settings.branding.primaryColor,
+                      secondary: settings.branding.secondaryColor,
+                      accent: settings.branding.accentColor
+                    },
+                    fontFamily: settings.branding.fontFamily,
+                    brandVoice: settings.branding.brandVoice,
+                    brandPersonality: settings.branding.brandPersonality,
+                    brandGuidelines: settings.branding.brandGuidelines
+                  }
+                  navigator.clipboard.writeText(JSON.stringify(brandData, null, 2))
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copy Brand Data
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  const colorPalette = `${settings.branding.primaryColor}, ${settings.branding.secondaryColor}, ${settings.branding.accentColor}`
+                  navigator.clipboard.writeText(colorPalette)
+                }}
+              >
+                <Palette className="w-4 h-4 mr-2" />
+                Copy Color Palette
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <PortalLayout>
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center gap-2">
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              <span>Loading customization settings...</span>
+            </div>
+          </div>
+        </PortalLayout>
+      </ProtectedRoute>
+    )
   }
 
   return (
@@ -284,10 +1004,13 @@ export default function PortalCustomizePage() {
                       </div>
 
                       <div>
-                        <Label className="text-sm font-medium text-gray-700">
+                        <Label htmlFor="tagline" className="text-sm font-medium text-gray-700">
                           Company Tagline
                         </Label>
                         <Input
+                          id="tagline"
+                          value={settings.branding.tagline}
+                          onChange={(e) => updateSetting('branding.tagline', e.target.value)}
                           placeholder="Your company tagline or slogan"
                           className="mt-2"
                         />
@@ -300,7 +1023,7 @@ export default function PortalCustomizePage() {
                         <Label className="text-sm font-medium text-gray-700">
                           Industry Category
                         </Label>
-                        <Select>
+                        <Select value={settings.branding.industry} onValueChange={(value) => updateSetting('branding.industry', value)}>
                           <SelectTrigger className="mt-2">
                             <SelectValue placeholder="Select your industry" />
                           </SelectTrigger>
@@ -633,10 +1356,10 @@ export default function PortalCustomizePage() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-6">
                   <div>
-                        <Label className="text-sm font-medium text-gray-700">Brand Voice</Label>
-                        <Select defaultValue="professional">
+                        <Label htmlFor="brandVoice" className="text-sm font-medium text-gray-700">Brand Voice</Label>
+                        <Select value={settings.branding.brandVoice} onValueChange={(value) => updateSetting('branding.brandVoice', value)}>
                           <SelectTrigger className="mt-2">
-                            <SelectValue />
+                            <SelectValue placeholder="Select brand voice" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="professional">Professional & Formal</SelectItem>
@@ -661,12 +1384,17 @@ export default function PortalCustomizePage() {
                           ].map((trait) => (
                             <div
                               key={trait.id}
-                              className="p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                              className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                settings.branding.brandPersonality === trait.id
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                              }`}
+                              onClick={() => updateSetting('branding.brandPersonality', trait.id)}
                             >
                               <div className="text-center">
                                 <div className="text-lg mb-1">{trait.icon}</div>
                                 <div className="text-xs font-medium">{trait.label}</div>
-                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -675,22 +1403,16 @@ export default function PortalCustomizePage() {
 
                     <div className="space-y-6">
                   <div>
-                        <Label className="text-sm font-medium text-gray-700">Brand Values</Label>
+                        <Label htmlFor="brandGuidelines" className="text-sm font-medium text-gray-700">Brand Guidelines</Label>
                         <Textarea
-                          placeholder="Enter your company's core values (e.g., Innovation, Quality, Customer Service)"
+                          id="brandGuidelines"
+                          value={settings.branding.brandGuidelines}
+                          onChange={(e) => updateSetting('branding.brandGuidelines', e.target.value)}
+                          placeholder="Enter your company's core values and brand guidelines (e.g., Innovation, Quality, Customer Service)"
                           rows={4}
                           className="mt-2"
                         />
                   </div>
-
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">Brand Mission</Label>
-                        <Textarea
-                          placeholder="Describe your company's mission statement"
-                          rows={3}
-                          className="mt-2"
-                        />
-                </div>
                     </div>
                   </div>
                 </CardContent>
@@ -850,11 +1572,22 @@ export default function PortalCustomizePage() {
                         <Download className="w-4 h-4 mr-2" />
                         Export Brand Kit
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => {
+                          const colorPalette = `${settings.branding.primaryColor}, ${settings.branding.secondaryColor}, ${settings.branding.accentColor}`
+                          navigator.clipboard.writeText(colorPalette)
+                        }}
+                      >
                         <Copy className="w-4 h-4 mr-2" />
                         Copy Brand Colors
                       </Button>
-                      <Button variant="outline" className="flex-1">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setIsBrandGuidelinesOpen(true)}
+                      >
                         <ExternalLink className="w-4 h-4 mr-2" />
                         View Brand Guidelines
                       </Button>
@@ -2262,6 +2995,9 @@ export default function PortalCustomizePage() {
             </TabsContent>
           </Tabs>
         </div>
+        
+        {/* Brand Guidelines Modal */}
+        <BrandGuidelinesModal />
       </PortalLayout>
     </ProtectedRoute>
   )

@@ -1,39 +1,34 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
-import { useCRM } from "@/contexts/crm-context"
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  DollarSign, 
-  Calendar,
-  Download,
-  Filter,
-  RefreshCw,
-  Eye,
-  EyeOff,
-  Target,
-  Award,
-  Activity,
-  Building2,
-  Phone,
-  Mail,
-  Clock,
-  FileText,
-  Settings,
-  FileText as Template,
-  PieChart,
-  LineChart,
-  TrendingUp as TrendingUpIcon,
-  Globe
-} from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useCRM } from "@/contexts/crm-context"
+import {
+  Activity,
+  BarChart3,
+  Building2,
+  Calendar,
+  Clock,
+  DollarSign,
+  Download,
+  FileText,
+  Filter,
+  Globe,
+  Mail,
+  Phone,
+  PieChart,
+  RefreshCw,
+  Settings,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  TrendingUp as TrendingUpIcon,
+  Users
+} from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 export default function ReportsPage() {
   const {
