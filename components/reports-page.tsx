@@ -54,10 +54,10 @@ export default function ReportsPage() {
   ]
 
   const metrics = [
-    { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-green-600' },
-    { id: 'leads', label: 'Leads', icon: Users, color: 'text-blue-600' },
-    { id: 'conversions', label: 'Conversions', icon: Target, color: 'text-purple-600' },
-    { id: 'activities', label: 'Activities', icon: Activity, color: 'text-orange-600' }
+    { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-green-400' },
+    { id: 'leads', label: 'Leads', icon: Users, color: 'text-blue-400' },
+    { id: 'conversions', label: 'Conversions', icon: Target, color: 'text-purple-400' },
+    { id: 'activities', label: 'Activities', icon: Activity, color: 'text-orange-400' }
   ]
 
   const analyticsTabs = [
@@ -282,25 +282,25 @@ export default function ReportsPage() {
   // Show loading screen if we're still loading initial data
   if (showLoadingState) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Analytics</h2>
-          <p className="text-gray-600">Fetching your CRM data...</p>
+          <h2 className="text-xl font-semibold text-white mb-2">Loading Analytics</h2>
+          <p className="text-gray-400">Fetching your CRM data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div ref={sectionRef} className="min-h-screen bg-gray-50">
+    <div ref={sectionRef} className="min-h-screen bg-gray-900">
       <div className="max-w-8xl mx-auto">
         {/* Header */}
         <div className="fade-in-element mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-              <p className="text-gray-600">Track your business performance and insights</p>
+              <h1 className="text-3xl font-bold text-white mb-2">Analytics Dashboard</h1>
+              <p className="text-gray-400">Track your business performance and insights</p>
             </div>
             <div className="flex items-center gap-3">
               <Button
@@ -358,9 +358,9 @@ export default function ReportsPage() {
 
         {/* Analytics Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8 bg-gray-700/50 border-gray-600">
             {analyticsTabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+              <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-gray-300 data-[state=active]:text-white data-[state=active]:bg-gray-600">
                 <tab.icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
               </TabsTrigger>
@@ -372,16 +372,16 @@ export default function ReportsPage() {
             {/* Period Selector */}
             <div className="fade-in-element mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Time Period:</span>
-                <div className="flex bg-gray-100 rounded-lg p-1">
+                <span className="text-sm font-medium text-gray-300">Time Period:</span>
+                <div className="flex bg-gray-700 rounded-lg p-1">
                   {periods.map((period) => (
                     <button
                       key={period.id}
                       onClick={() => setSelectedPeriod(period.value)}
                       className={`px-3 py-1 text-sm rounded-md transition-colors ${
                         selectedPeriod === period.value
-                          ? 'bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-gray-600 text-white shadow-sm'
+                          : 'text-gray-400 hover:text-white'
                       }`}
                     >
                       {period.label}
@@ -401,18 +401,18 @@ export default function ReportsPage() {
             return (
               <Card 
                 key={metric.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg bg-gray-800/50 border-gray-700 ${
                   isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
                 } ${isDataLoading ? 'opacity-50' : ''}`}
                 onClick={() => setSelectedMetric(metric.id)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <div className={`p-2 rounded-lg ${metric.color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+                    <div className={`p-2 rounded-lg ${metric.color.replace('text-', 'bg-').replace('-400', '-900/50')}`}>
                       <metric.icon className={`w-5 h-5 ${metric.color}`} />
                     </div>
                     {isDataLoading ? (
-                      <div className="w-8 h-4 bg-gray-200 rounded animate-pulse" />
+                      <div className="w-8 h-4 bg-gray-700 rounded animate-pulse" />
                     ) : (
                       <Badge variant={isPositive ? 'default' : 'destructive'} className="text-xs">
                         {isPositive ? '+' : ''}{data.change}%
@@ -424,23 +424,23 @@ export default function ReportsPage() {
                   <div className="space-y-1">
                     {isDataLoading ? (
                       <div className="space-y-2">
-                        <div className="h-8 bg-gray-200 rounded animate-pulse" />
-                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                        <div className="h-3 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-8 bg-gray-700 rounded animate-pulse" />
+                        <div className="h-4 bg-gray-700 rounded animate-pulse" />
+                        <div className="h-3 bg-gray-700 rounded animate-pulse" />
                       </div>
                     ) : (
                       <>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-2xl font-bold text-white">
                           {metric.id === 'revenue' ? `$${data.current.toLocaleString()}` : data.current.toLocaleString()}
                         </p>
-                        <p className="text-sm text-gray-600">{metric.label}</p>
+                        <p className="text-sm text-gray-400">{metric.label}</p>
                         <div className="flex items-center gap-1 text-xs">
                           {isPositive ? (
-                            <TrendingUp className="w-3 h-3 text-green-600" />
+                            <TrendingUp className="w-3 h-3 text-green-400" />
                           ) : (
-                            <TrendingDown className="w-3 h-3 text-red-600" />
+                            <TrendingDown className="w-3 h-3 text-red-400" />
                           )}
-                          <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
+                          <span className={isPositive ? 'text-green-400' : 'text-red-400'}>
                             {isPositive ? '+' : ''}{data.change}% from last period
                           </span>
                         </div>
@@ -456,13 +456,13 @@ export default function ReportsPage() {
         {/* Charts Section */}
         <div className="fade-in-element grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Revenue Chart */}
-          <Card>
+          <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <BarChart3 className="w-5 h-5" />
                 Revenue Trend
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-400">
                 Monthly revenue performance over time
               </CardDescription>
             </CardHeader>
@@ -471,8 +471,8 @@ export default function ReportsPage() {
                 <div className="h-64 flex items-end justify-between gap-2">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className="flex flex-col items-center gap-2">
-                      <div className="bg-gray-200 rounded-t-sm w-8 h-32 animate-pulse" />
-                      <div className="w-8 h-3 bg-gray-200 rounded animate-pulse" />
+                      <div className="bg-gray-700 rounded-t-sm w-8 h-32 animate-pulse" />
+                      <div className="w-8 h-3 bg-gray-700 rounded animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -484,14 +484,14 @@ export default function ReportsPage() {
                     return (
                       <div key={item.month} className="flex flex-col items-center gap-2">
                         <div 
-                          className="bg-blue-500 rounded-t-sm w-8 transition-all duration-500 hover:bg-blue-600 cursor-pointer"
+                          className="bg-blue-500 rounded-t-sm w-8 transition-all duration-500 hover:bg-blue-400 cursor-pointer"
                           style={{ 
                             height: `${height}px`,
                             animationDelay: `${index * 100}ms`
                           }}
                           title={`$${item.revenue.toLocaleString()}`}
                         />
-                        <span className="text-xs text-gray-600">{item.month}</span>
+                        <span className="text-xs text-gray-400">{item.month}</span>
                       </div>
                     )
                   })}
@@ -501,13 +501,13 @@ export default function ReportsPage() {
           </Card>
 
           {/* Leads Chart */}
-          <Card>
+          <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <Users className="w-5 h-5" />
                 Leads Generated
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-400">
                 New leads acquired each month
               </CardDescription>
             </CardHeader>
@@ -516,8 +516,8 @@ export default function ReportsPage() {
                 <div className="h-64 flex items-end justify-between gap-2">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className="flex flex-col items-center gap-2">
-                      <div className="bg-gray-200 rounded-t-sm w-8 h-32 animate-pulse" />
-                      <div className="w-8 h-3 bg-gray-200 rounded animate-pulse" />
+                      <div className="bg-gray-700 rounded-t-sm w-8 h-32 animate-pulse" />
+                      <div className="w-8 h-3 bg-gray-700 rounded animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -529,14 +529,14 @@ export default function ReportsPage() {
                     return (
                       <div key={item.month} className="flex flex-col items-center gap-2">
                         <div 
-                          className="bg-green-500 rounded-t-sm w-8 transition-all duration-500 hover:bg-green-600 cursor-pointer"
+                          className="bg-green-500 rounded-t-sm w-8 transition-all duration-500 hover:bg-green-400 cursor-pointer"
                           style={{ 
                             height: `${height}px`,
                             animationDelay: `${index * 100}ms`
                           }}
                           title={`${item.leads} leads`}
                         />
-                        <span className="text-xs text-gray-600">{item.month}</span>
+                        <span className="text-xs text-gray-400">{item.month}</span>
                       </div>
                     )
                   })}
@@ -548,13 +548,13 @@ export default function ReportsPage() {
 
         {/* Recent Activity */}
         <div className="fade-in-element">
-          <Card>
+          <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <Activity className="w-5 h-5" />
                 Recent Activity
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-400">
                 Latest business activities and updates
               </CardDescription>
             </CardHeader>
@@ -562,13 +562,13 @@ export default function ReportsPage() {
               {isDataLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 5 }).map((_, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse" />
+                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+                      <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/3" />
+                        <div className="h-4 bg-gray-700 rounded animate-pulse" />
+                        <div className="h-3 bg-gray-700 rounded animate-pulse w-1/3" />
                       </div>
-                      <div className="w-12 h-5 bg-gray-200 rounded animate-pulse" />
+                      <div className="w-12 h-5 bg-gray-700 rounded animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -589,7 +589,7 @@ export default function ReportsPage() {
                         case 'call': return 'bg-blue-500'
                         case 'email': return 'bg-green-500'
                         case 'meeting': return 'bg-purple-500'
-                        default: return 'bg-gray-500'
+                        default: return 'bg-gray-700/500'
                       }
                     }
 
@@ -606,11 +606,11 @@ export default function ReportsPage() {
                     }
 
                     return (
-                      <div key={activity.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div key={activity.id || index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-600/50 transition-colors">
                         <div className={`w-2 h-2 ${getActivityColor(activity.type)} rounded-full`} />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{activity.subject || activity.title || 'Activity'}</p>
-                          <p className="text-xs text-gray-600">{formatTimeAgo(activity.createdAt || activity.date)}</p>
+                          <p className="text-sm font-medium text-white">{activity.subject || activity.title || 'Activity'}</p>
+                          <p className="text-xs text-gray-400">{formatTimeAgo(activity.createdAt || activity.date)}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           {getActivityIcon(activity.type)}
@@ -623,7 +623,7 @@ export default function ReportsPage() {
                   })}
                   
                   {activities.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-gray-400">
                       <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
                       <p>No recent activities found</p>
                     </div>
@@ -638,29 +638,29 @@ export default function ReportsPage() {
           {/* Contacts Tab */}
           <TabsContent value="contacts" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Users className="w-5 h-5" />
                     Contact Overview
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-400">
                     Contact metrics and performance
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Contacts</span>
-                      <span className="text-2xl font-bold">{contacts.length}</span>
+                      <span className="text-sm text-gray-400">Total Contacts</span>
+                      <span className="text-2xl font-bold text-white">{contacts.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">New This Period</span>
-                      <span className="text-lg font-semibold text-green-600">{realData.leads.current}</span>
+                      <span className="text-sm text-gray-400">New This Period</span>
+                      <span className="text-lg font-semibold text-green-400">{realData.leads.current}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Growth Rate</span>
-                      <span className={`text-lg font-semibold ${realData.leads.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="text-sm text-gray-400">Growth Rate</span>
+                      <span className={`text-lg font-semibold ${realData.leads.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {realData.leads.change >= 0 ? '+' : ''}{realData.leads.change}%
                       </span>
                     </div>
@@ -668,13 +668,13 @@ export default function ReportsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <PieChart className="w-5 h-5" />
                     Contact Sources
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-400">
                     Where your contacts come from
                   </CardDescription>
                 </CardHeader>
@@ -682,15 +682,15 @@ export default function ReportsPage() {
                   <div className="space-y-3">
                     {['Website', 'Referral', 'Social Media', 'Email Campaign', 'Other'].map((source, index) => (
                       <div key={source} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{source}</span>
+                        <span className="text-sm text-gray-400">{source}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div className="w-20 bg-gray-600 rounded-full h-2">
                             <div 
                               className="bg-blue-500 h-2 rounded-full" 
                               style={{ width: `${Math.random() * 80 + 20}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium">{Math.floor(Math.random() * 50 + 10)}%</span>
+                          <span className="text-sm font-medium text-white">{Math.floor(Math.random() * 50 + 10)}%</span>
                         </div>
                       </div>
                     ))}
@@ -699,25 +699,25 @@ export default function ReportsPage() {
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle>Recent Contacts</CardTitle>
-                <CardDescription>Latest contact additions</CardDescription>
+                <CardTitle className="text-white">Recent Contacts</CardTitle>
+                <CardDescription className="text-gray-400">Latest contact additions</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {contacts.slice(0, 5).map((contact, index) => (
-                    <div key={contact.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={contact.id || index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {(contact.firstName?.[0] || contact.name?.[0] || 'C').toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-white">
                           {contact.firstName} {contact.lastName} {contact.name}
                         </p>
-                        <p className="text-sm text-gray-600">{contact.email}</p>
+                        <p className="text-sm text-gray-400">{contact.email}</p>
                       </div>
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="border-gray-600 text-gray-300">
                         {contact.status || 'Active'}
                       </Badge>
                     </div>
@@ -730,56 +730,56 @@ export default function ReportsPage() {
           {/* Deals Tab */}
           <TabsContent value="deals" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Target className="w-5 h-5" />
                     Pipeline Value
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-white">
                     ${deals.reduce((sum, deal) => sum + (deal.value || deal.amount || 0), 0).toLocaleString()}
                   </div>
-                  <p className="text-sm text-gray-600">Total pipeline value</p>
+                  <p className="text-sm text-gray-400">Total pipeline value</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <TrendingUpIcon className="w-5 h-5" />
                     Win Rate
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-600">
+                  <div className="text-3xl font-bold text-green-400">
                     {deals.length > 0 ? Math.round((deals.filter(deal => deal.stage === 'Closed Won' || deal.status === 'closed').length / deals.length) * 100) : 0}%
                   </div>
-                  <p className="text-sm text-gray-600">Deal closure rate</p>
+                  <p className="text-sm text-gray-400">Deal closure rate</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Clock className="w-5 h-5" />
                     Avg Deal Size
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-3xl font-bold text-blue-400">
                     ${deals.length > 0 ? Math.round(deals.reduce((sum, deal) => sum + (deal.value || deal.amount || 0), 0) / deals.length).toLocaleString() : 0}
                   </div>
-                  <p className="text-sm text-gray-600">Average deal value</p>
+                  <p className="text-sm text-gray-400">Average deal value</p>
                 </CardContent>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle>Deal Pipeline</CardTitle>
-                <CardDescription>Deals by stage</CardDescription>
+                <CardTitle className="text-white">Deal Pipeline</CardTitle>
+                <CardDescription className="text-gray-400">Deals by stage</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -787,14 +787,14 @@ export default function ReportsPage() {
                     const stageDeals = deals.filter(deal => deal.stage === stage)
                     const stageValue = stageDeals.reduce((sum, deal) => sum + (deal.value || deal.amount || 0), 0)
                     return (
-                      <div key={stage} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={stage} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                          <span className="font-medium">{stage}</span>
+                          <span className="font-medium text-white">{stage}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="text-sm text-gray-600">{stageDeals.length} deals</span>
-                          <span className="font-semibold">${stageValue.toLocaleString()}</span>
+                          <span className="text-sm text-gray-400">{stageDeals.length} deals</span>
+                          <span className="font-semibold text-white">${stageValue.toLocaleString()}</span>
                         </div>
                       </div>
                     )
@@ -803,29 +803,29 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle>All Deals</CardTitle>
-                <CardDescription>Complete list of deals in your CRM</CardDescription>
+                <CardTitle className="text-white">All Deals</CardTitle>
+                <CardDescription className="text-gray-400">Complete list of deals in your CRM</CardDescription>
               </CardHeader>
               <CardContent>
                 {isDataLoading ? (
                   <div className="space-y-3">
                     {Array.from({ length: 5 }).map((_, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+                        <div className="w-10 h-10 bg-gray-600 rounded-full animate-pulse" />
                         <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
-                          <div className="h-3 bg-gray-200 rounded animate-pulse w-1/3" />
+                          <div className="h-4 bg-gray-700 rounded animate-pulse w-1/2" />
+                          <div className="h-3 bg-gray-700 rounded animate-pulse w-1/3" />
                         </div>
-                        <div className="w-20 h-6 bg-gray-200 rounded animate-pulse" />
+                        <div className="w-20 h-6 bg-gray-700 rounded animate-pulse" />
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {deals.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-gray-400">
                         <Target className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p>No deals found</p>
                       </div>
@@ -839,7 +839,7 @@ export default function ReportsPage() {
                             case 'Needs Analysis': return 'bg-yellow-500'
                             case 'Proposal': return 'bg-purple-500'
                             case 'Negotiation': return 'bg-orange-500'
-                            default: return 'bg-gray-500'
+                            default: return 'bg-gray-700/500'
                           }
                         }
 
@@ -848,23 +848,23 @@ export default function ReportsPage() {
                         }
 
                         return (
-                          <div key={deal.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div key={deal.id || index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-600/50 transition-colors">
                             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                               {deal.name?.[0]?.toUpperCase() || 'D'}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{deal.name || deal.title || 'Deal'}</p>
-                              <p className="text-sm text-gray-600">
+                              <p className="font-medium text-white">{deal.name || deal.title || 'Deal'}</p>
+                              <p className="text-sm text-gray-400">
                                 {deal.company && `Company: ${deal.company}`}
                                 {deal.contact && ` • Contact: ${deal.contact}`}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="text-right">
-                                <p className="font-semibold text-gray-900">
+                                <p className="font-semibold text-white">
                                   ${(deal.value || deal.amount || 0).toLocaleString()}
                                 </p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-gray-400">
                                   {deal.createdAt && formatDate(deal.createdAt)}
                                 </p>
                               </div>
@@ -888,9 +888,9 @@ export default function ReportsPage() {
           {/* Companies Tab */}
           <TabsContent value="companies" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Building2 className="w-5 h-5" />
                     Company Overview
                   </CardTitle>
@@ -898,12 +898,12 @@ export default function ReportsPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Companies</span>
-                      <span className="text-2xl font-bold">{companies.length}</span>
+                      <span className="text-sm text-gray-400">Total Companies</span>
+                      <span className="text-2xl font-bold text-white">{companies.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Active Companies</span>
-                      <span className="text-lg font-semibold text-green-600">
+                      <span className="text-sm text-gray-400">Active Companies</span>
+                      <span className="text-lg font-semibold text-green-400">
                         {companies.filter(company => company.status === 'active' || !company.status).length}
                       </span>
                     </div>
@@ -911,23 +911,23 @@ export default function ReportsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle>Company Industries</CardTitle>
+                  <CardTitle className="text-white">Company Industries</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {['Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Other'].map((industry, index) => (
                       <div key={industry} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{industry}</span>
+                        <span className="text-sm text-gray-400">{industry}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div className="w-20 bg-gray-600 rounded-full h-2">
                             <div 
                               className="bg-green-500 h-2 rounded-full" 
                               style={{ width: `${Math.random() * 80 + 20}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium">{Math.floor(Math.random() * 30 + 5)}</span>
+                          <span className="text-sm font-medium text-white">{Math.floor(Math.random() * 30 + 5)}</span>
                         </div>
                       </div>
                     ))}
@@ -936,41 +936,41 @@ export default function ReportsPage() {
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle>All Companies</CardTitle>
-                <CardDescription>Complete list of companies in your CRM</CardDescription>
+                <CardTitle className="text-white">All Companies</CardTitle>
+                <CardDescription className="text-gray-400">Complete list of companies in your CRM</CardDescription>
               </CardHeader>
               <CardContent>
                 {isDataLoading ? (
                   <div className="space-y-3">
                     {Array.from({ length: 5 }).map((_, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+                        <div className="w-10 h-10 bg-gray-600 rounded-full animate-pulse" />
                         <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3" />
-                          <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4" />
+                          <div className="h-4 bg-gray-700 rounded animate-pulse w-1/3" />
+                          <div className="h-3 bg-gray-700 rounded animate-pulse w-1/4" />
                         </div>
-                        <div className="w-16 h-6 bg-gray-200 rounded animate-pulse" />
+                        <div className="w-16 h-6 bg-gray-700 rounded animate-pulse" />
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {companies.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-gray-400">
                         <Building2 className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p>No companies found</p>
                       </div>
                     ) : (
                       companies.map((company, index) => (
-                        <div key={company.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div key={company.id || index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-600/50 transition-colors">
                           <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                             {company.name?.[0]?.toUpperCase() || 'C'}
                           </div>
                           <div className="flex-1">
-                            <p className="font-medium text-gray-900">{company.name}</p>
-                            <p className="text-sm text-gray-600">{company.industry || 'No industry specified'}</p>
+                            <p className="font-medium text-white">{company.name}</p>
+                            <p className="text-sm text-gray-400">{company.industry || 'No industry specified'}</p>
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">
@@ -996,9 +996,9 @@ export default function ReportsPage() {
           {/* Activities Tab */}
           <TabsContent value="activities" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Activity className="w-5 h-5" />
                     Activity Overview
                   </CardTitle>
@@ -1006,34 +1006,34 @@ export default function ReportsPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Activities</span>
-                      <span className="text-2xl font-bold">{activities.length}</span>
+                      <span className="text-sm text-gray-400">Total Activities</span>
+                      <span className="text-2xl font-bold text-white">{activities.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">This Period</span>
-                      <span className="text-lg font-semibold text-blue-600">{realData.activities.current}</span>
+                      <span className="text-sm text-gray-400">This Period</span>
+                      <span className="text-lg font-semibold text-blue-400">{realData.activities.current}</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle>Activity Types</CardTitle>
+                  <CardTitle className="text-white">Activity Types</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {['Calls', 'Emails', 'Meetings', 'Tasks', 'Notes'].map((type, index) => (
                       <div key={type} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{type}</span>
+                        <span className="text-sm text-gray-400">{type}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div className="w-20 bg-gray-600 rounded-full h-2">
                             <div 
                               className="bg-purple-500 h-2 rounded-full" 
                               style={{ width: `${Math.random() * 80 + 20}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium">{Math.floor(Math.random() * 20 + 5)}</span>
+                          <span className="text-sm font-medium text-white">{Math.floor(Math.random() * 20 + 5)}</span>
                         </div>
                       </div>
                     ))}
@@ -1042,29 +1042,29 @@ export default function ReportsPage() {
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle>All Activities</CardTitle>
-                <CardDescription>Complete list of activities in your CRM</CardDescription>
+                <CardTitle className="text-white">All Activities</CardTitle>
+                <CardDescription className="text-gray-400">Complete list of activities in your CRM</CardDescription>
               </CardHeader>
               <CardContent>
                 {isDataLoading ? (
                   <div className="space-y-3">
                     {Array.from({ length: 5 }).map((_, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+                        <div className="w-8 h-8 bg-gray-600 rounded-full animate-pulse" />
                         <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
-                          <div className="h-3 bg-gray-200 rounded animate-pulse w-1/4" />
+                          <div className="h-4 bg-gray-700 rounded animate-pulse w-2/3" />
+                          <div className="h-3 bg-gray-700 rounded animate-pulse w-1/4" />
                         </div>
-                        <div className="w-16 h-6 bg-gray-200 rounded animate-pulse" />
+                        <div className="w-16 h-6 bg-gray-700 rounded animate-pulse" />
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {activities.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-gray-400">
                         <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p>No activities found</p>
                       </div>
@@ -1084,7 +1084,7 @@ export default function ReportsPage() {
                             case 'call': return 'bg-blue-500'
                             case 'email': return 'bg-green-500'
                             case 'meeting': return 'bg-purple-500'
-                            default: return 'bg-gray-500'
+                            default: return 'bg-gray-700/500'
                           }
                         }
 
@@ -1101,13 +1101,13 @@ export default function ReportsPage() {
                         }
 
                         return (
-                          <div key={activity.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div key={activity.id || index} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg hover:bg-gray-600/50 transition-colors">
                             <div className={`w-8 h-8 ${getActivityColor(activity.type)} rounded-full flex items-center justify-center text-white`}>
                               {getActivityIcon(activity.type)}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{activity.subject || activity.title || 'Activity'}</p>
-                              <p className="text-sm text-gray-600">{formatTimeAgo(activity.createdAt || activity.date)}</p>
+                              <p className="font-medium text-white">{activity.subject || activity.title || 'Activity'}</p>
+                              <p className="text-sm text-gray-400">{formatTimeAgo(activity.createdAt || activity.date)}</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant="outline">
@@ -1132,13 +1132,13 @@ export default function ReportsPage() {
           {/* Reports Tab */}
           <TabsContent value="reports" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <FileText className="w-5 h-5" />
                     Generate Reports
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-400">
                     Create detailed analytics reports
                   </CardDescription>
                 </CardHeader>
@@ -1148,15 +1148,15 @@ export default function ReportsPage() {
                       <Download className="w-4 h-4 mr-2" />
                       Contact Report
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700">
                       <Download className="w-4 h-4 mr-2" />
                       Deal Pipeline Report
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700">
                       <Download className="w-4 h-4 mr-2" />
                       Activity Report
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-700">
                       <Download className="w-4 h-4 mr-2" />
                       Company Report
                     </Button>
@@ -1164,22 +1164,22 @@ export default function ReportsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-gray-800/50 border-gray-700">
                 <CardHeader>
-                  <CardTitle>Report History</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Report History</CardTitle>
+                  <CardDescription className="text-gray-400">
                     Previously generated reports
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {['Monthly Summary - Dec 2024', 'Q4 Performance Report', 'Contact Analysis - Nov 2024'].map((report, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
                         <div>
-                          <p className="font-medium">{report}</p>
-                          <p className="text-sm text-gray-600">Generated 2 days ago</p>
+                          <p className="font-medium text-white">{report}</p>
+                          <p className="text-sm text-gray-400">Generated 2 days ago</p>
                         </div>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-700">
                           <Download className="w-4 h-4" />
                         </Button>
                       </div>
@@ -1192,27 +1192,27 @@ export default function ReportsPage() {
 
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-white">
                   <Settings className="w-5 h-5" />
                   Analytics Settings
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-400">
                   Configure your analytics preferences
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Default Time Period</label>
+                    <label className="text-sm font-medium text-gray-300">Default Time Period</label>
                     <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full border-gray-600 bg-gray-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-gray-700 border-gray-600">
                         {periods.map((period) => (
-                          <SelectItem key={period.id} value={period.value}>
+                          <SelectItem key={period.id} value={period.value} className="text-white hover:bg-gray-600">
                             {period.label}
                           </SelectItem>
                         ))}
@@ -1221,27 +1221,27 @@ export default function ReportsPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Auto-refresh Interval</label>
+                    <label className="text-sm font-medium text-gray-300">Auto-refresh Interval</label>
                     <Select defaultValue="5min">
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full border-gray-600 bg-gray-700 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1min">1 minute</SelectItem>
-                        <SelectItem value="5min">5 minutes</SelectItem>
-                        <SelectItem value="15min">15 minutes</SelectItem>
-                        <SelectItem value="30min">30 minutes</SelectItem>
-                        <SelectItem value="off">Off</SelectItem>
+                      <SelectContent className="bg-gray-700 border-gray-600">
+                        <SelectItem value="1min" className="text-white hover:bg-gray-600">1 minute</SelectItem>
+                        <SelectItem value="5min" className="text-white hover:bg-gray-600">5 minutes</SelectItem>
+                        <SelectItem value="15min" className="text-white hover:bg-gray-600">15 minutes</SelectItem>
+                        <SelectItem value="30min" className="text-white hover:bg-gray-600">30 minutes</SelectItem>
+                        <SelectItem value="off" className="text-white hover:bg-gray-600">Off</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Email Notifications</label>
-                      <p className="text-sm text-gray-600">Receive weekly analytics summaries</p>
+                      <label className="text-sm font-medium text-gray-300">Email Notifications</label>
+                      <p className="text-sm text-gray-400">Receive weekly analytics summaries</p>
                     </div>
-                    <Button variant="outline" size="sm">Enable</Button>
+                    <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-700">Enable</Button>
                   </div>
                 </div>
               </CardContent>

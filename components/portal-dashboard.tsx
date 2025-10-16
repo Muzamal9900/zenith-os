@@ -11,6 +11,7 @@ import {
   Lock, Unlock, Eye, EyeOff, Download, Upload,
   Play, Pause, Square, RotateCcw, Maximize2
 } from "lucide-react"
+import OnboardingToolsWidgets from "./onboarding-tools-widgets"
 
 export default function PortalDashboard() {
   const [selectedIndustry, setSelectedIndustry] = useState('blank')
@@ -162,7 +163,7 @@ export default function PortalDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <div className="max-w-8xl mx-auto">
         {/* business platform Header */}
         <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
@@ -202,11 +203,16 @@ export default function PortalDashboard() {
 
         {/* Industry Selection */}
         <div className="px-6 py-6">
+          {/* Your Selected Tools */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Choose Your Industry Template</h2>
-            <p className="text-gray-600 mb-6">
-              Start with a blank canvas or select an industry template. We'll customize everything for your specific needs.
-            </p>
+            <OnboardingToolsWidgets />
+          </div>
+
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-white mb-4">Choose Your Industry Template</h2>
+              <p className="text-gray-400 mb-6">
+                Start with a blank canvas or select an industry template. We'll customize everything for your specific needs.
+              </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {industries.map((industry) => {
                 const Icon = industry.icon
@@ -216,21 +222,21 @@ export default function PortalDashboard() {
                     onClick={() => setSelectedIndustry(industry.id)}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${
                       selectedIndustry === industry.id
-                        ? 'border-purple-500 bg-purple-50 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                        ? 'border-purple-500 bg-purple-900/30 shadow-md'
+                        : 'border-gray-600 bg-gray-800/50 hover:border-gray-500 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${industry.color} flex items-center justify-center`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{industry.name}</h3>
-                        <p className="text-sm text-gray-600">{industry.description}</p>
-                      </div>
+                        <div>
+                          <h3 className="font-semibold text-white">{industry.name}</h3>
+                          <p className="text-sm text-gray-400">{industry.description}</p>
+                        </div>
                     </div>
                     {selectedIndustry === industry.id && (
-                      <div className="flex items-center gap-2 text-purple-600 text-sm">
+                      <div className="flex items-center gap-2 text-purple-400 text-sm">
                         <CheckCircle className="w-4 h-4" />
                         Selected Template
                       </div>
@@ -242,16 +248,16 @@ export default function PortalDashboard() {
           </div>
 
           {/* Business Platform Modules */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Business Platform Modules</h2>
-            <p className="text-gray-600 mb-6">
-              Three core modules that make up your complete business platform. Each can be customized for your industry.
-            </p>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-white mb-4">Business Platform Modules</h2>
+              <p className="text-gray-400 mb-6">
+                Three core modules that make up your complete business platform. Each can be customized for your industry.
+              </p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {operatingSystemModules.map((module) => {
                 const Icon = module.icon
                 return (
-                  <div key={module.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div key={module.id} className="bg-gray-800/50 rounded-xl shadow-sm border border-gray-700 overflow-hidden">
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -259,14 +265,14 @@ export default function PortalDashboard() {
                             <Icon className="w-6 h-6 text-white" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900">{module.name}</h3>
-                            <p className="text-sm text-gray-600">{module.description}</p>
+                            <h3 className="text-lg font-semibold text-white">{module.name}</h3>
+                            <p className="text-sm text-gray-400">{module.description}</p>
                           </div>
                         </div>
                         <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                           module.status === 'locked' 
-                            ? 'bg-gray-100 text-gray-600' 
-                            : 'bg-green-100 text-green-600'
+                            ? 'bg-gray-700 text-gray-300' 
+                            : 'bg-green-900/50 text-green-400'
                         }`}>
                           {module.status === 'locked' ? 'Locked' : 'Unlocked'}
                         </div>
@@ -274,7 +280,7 @@ export default function PortalDashboard() {
                       
                       <div className="space-y-2 mb-4">
                         {module.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                          <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
                             <CheckCircle className="w-4 h-4 text-green-500" />
                             {feature}
                           </div>
@@ -282,15 +288,15 @@ export default function PortalDashboard() {
                       </div>
 
                       {isCustomizing && (
-                        <div className="border-t border-gray-200 pt-4">
-                          <h4 className="text-sm font-semibold text-gray-900 mb-3">Customization Options:</h4>
+                        <div className="border-t border-gray-600 pt-4">
+                          <h4 className="text-sm font-semibold text-white mb-3">Customization Options:</h4>
                           <div className="space-y-3">
                             {Object.entries(module.customization).map(([key, options]) => (
                               <div key={key}>
-                                <h5 className="text-xs font-medium text-gray-700 mb-1 capitalize">{key}:</h5>
+                                <h5 className="text-xs font-medium text-gray-300 mb-1 capitalize">{key}:</h5>
                                 <div className="flex flex-wrap gap-1">
-                                  {options.map((option, idx) => (
-                                    <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                                  {options.map((option: string, idx: number) => (
+                                    <span key={idx} className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">
                                       {option}
                                     </span>
                                   ))}
@@ -303,7 +309,7 @@ export default function PortalDashboard() {
 
                       <button className={`w-full mt-4 px-4 py-2 rounded-lg font-medium transition-colors ${
                         module.status === 'locked'
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
                       }`}>
                         {module.status === 'locked' ? 'Module Locked' : `Configure ${module.name}`}
@@ -316,28 +322,28 @@ export default function PortalDashboard() {
           </div>
 
           {/* White Label Features */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">White-Label Features</h2>
-            <p className="text-gray-600 mb-6">
-              What makes our business platform unique and valuable for your business.
-            </p>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-white mb-4">White-Label Features</h2>
+              <p className="text-gray-400 mb-6">
+                What makes our business platform unique and valuable for your business.
+              </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {whiteLabelFeatures.map((feature) => {
                 const Icon = feature.icon
                 return (
-                  <div key={feature.category} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div key={feature.category} className="bg-gray-800/50 rounded-xl shadow-sm border border-gray-700 p-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-purple-600" />
+                      <div className="w-10 h-10 bg-purple-900/50 rounded-lg flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-purple-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{feature.category}</h3>
-                        <p className="text-sm text-gray-600">{feature.description}</p>
+                        <h3 className="font-semibold text-white">{feature.category}</h3>
+                        <p className="text-sm text-gray-400">{feature.description}</p>
                       </div>
                     </div>
                     <div className="space-y-2">
                       {feature.features.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                        <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
                           <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                           {item}
                         </div>
@@ -350,37 +356,37 @@ export default function PortalDashboard() {
           </div>
 
           {/* Development Options */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">How Do You Want to Build?</h2>
-            <p className="text-gray-600 mb-6">
-              Choose how you want to customize your business platform for your industry.
-            </p>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-white mb-4">How Do You Want to Build?</h2>
+              <p className="text-gray-400 mb-6">
+                Choose how you want to customize your business platform for your industry.
+              </p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {developmentOptions.map((option) => {
                 const Icon = option.icon
                 return (
-                  <div key={option.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div key={option.id} className="bg-gray-800/50 rounded-xl shadow-sm border border-gray-700 p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{option.title}</h3>
-                        <p className="text-gray-600">{option.description}</p>
+                        <h3 className="text-lg font-semibold text-white">{option.title}</h3>
+                        <p className="text-gray-400">{option.description}</p>
                       </div>
                     </div>
                     <div className="space-y-2 mb-4">
                       {option.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                        <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
                           <CheckCircle className="w-4 h-4 text-green-500" />
                           {feature}
                         </div>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-600">
                       <div>
-                        <p className="text-sm text-gray-600">Pricing: <span className="font-medium text-gray-900">{option.pricing}</span></p>
-                        <p className="text-sm text-gray-600">Timeline: <span className="font-medium text-gray-900">{option.timeline}</span></p>
+                        <p className="text-sm text-gray-400">Pricing: <span className="font-medium text-white">{option.pricing}</span></p>
+                        <p className="text-sm text-gray-400">Timeline: <span className="font-medium text-white">{option.timeline}</span></p>
                       </div>
                       <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                         Choose This Option

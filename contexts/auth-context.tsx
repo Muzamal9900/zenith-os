@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('zenith_token', data.token)
         localStorage.setItem('zenith_user', JSON.stringify(data.user))
         
-        // Redirect to CRM after successful login
+        // Redirect to portal after successful login
         if (typeof window !== 'undefined') {
           window.location.href = '/portal'
         }
@@ -99,9 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('zenith_token', result.token)
         localStorage.setItem('zenith_user', JSON.stringify(result.user))
         
-        // Redirect to CRM after successful registration
+        // Redirect to onboarding after successful registration
         if (typeof window !== 'undefined') {
-          window.location.href = '/portal'
+          window.location.href = '/onboarding'
         }
         
         return { success: true }

@@ -5,6 +5,7 @@ import "./globals.css"
 import { Suspense } from "react"
 import { AuthProvider } from "@/contexts/auth-context"
 import { CRMProvider } from "@/contexts/crm-context"
+import { OnboardingProvider } from "@/contexts/onboarding-context"
 import { ToastProvider } from "@/components/ui/toast"
 
 const inter = Inter({
@@ -29,11 +30,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable} antialiased`}>
         <AuthProvider>
-          <CRMProvider>
-            <ToastProvider>
-              <Suspense fallback={null}>{children}</Suspense>
-            </ToastProvider>
-          </CRMProvider>
+          <OnboardingProvider>
+            <CRMProvider>
+              <ToastProvider>
+                <Suspense fallback={null}>{children}</Suspense>
+              </ToastProvider>
+            </CRMProvider>
+          </OnboardingProvider>
         </AuthProvider>
       </body>
     </html>

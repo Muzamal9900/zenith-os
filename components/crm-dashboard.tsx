@@ -25,6 +25,8 @@ import {
   PieChart,
   Activity
 } from "lucide-react"
+import OnboardingToolsWidgets from "./onboarding-tools-widgets"
+import CRMToolsQuickAccess from "./crm-tools-quick-access"
 
 interface Contact {
   id: string
@@ -246,6 +248,7 @@ export default function CRMDashboard() {
               <p className="text-gray-600">Manage your customer relationships</p>
             </div>
             <div className="flex items-center gap-4">
+              <CRMToolsQuickAccess />
               <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 Add Contact
@@ -256,6 +259,11 @@ export default function CRMDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Your Selected Tools */}
+        <div className="fade-in-element mb-8">
+          <OnboardingToolsWidgets maxTools={6} />
+        </div>
+
         {/* Industry Selector */}
         <div className="fade-in-element mb-8">
           <div className="flex flex-wrap gap-3">

@@ -15,9 +15,27 @@ const CTASection = dynamic(() => import("@/components/cta-section"), { ssr: fals
 
 export default function Home() {
   return (
-    <>
+    <div className="relative min-h-screen">
+      {/* Elegant Global Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(120,119,198,0.05),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(59,130,246,0.03),transparent_50%)]" />
+        
+        {/* Subtle Pattern Overlay */}
+        <div className="absolute inset-0 opacity-[0.02]">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '100px 100px'
+          }} />
+        </div>
+      </div>
+      
       <SiteHeader />
-      <main className="min-h-screen pt-16">
+      <main className="relative min-h-screen pt-16">
         <HeroSection />
         <ProblemSection />
         <OperatingSystemSection />
@@ -30,6 +48,6 @@ export default function Home() {
         <CTASection />
       </main>
       <Footer />
-    </>
+    </div>
   )
 }

@@ -46,7 +46,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/crm')
+      router.push('/portal')
     }
   }, [user, router])
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
     
     if (result.success) {
       setSuccess('Login successful! Redirecting...')
-      setTimeout(() => router.push('/crm'), 1000)
+      setTimeout(() => router.push('/portal'), 1000)
     } else {
       setError(result.error || 'Login failed')
     }
@@ -98,7 +98,7 @@ export default function LoginPage() {
     
     if (result.success) {
       setSuccess('Registration successful! Redirecting...')
-      setTimeout(() => router.push('/crm'), 1000)
+      setTimeout(() => router.push('/onboarding'), 1000)
     } else {
       setError(result.error || 'Registration failed')
     }

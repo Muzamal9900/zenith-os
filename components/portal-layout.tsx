@@ -12,7 +12,8 @@ import {
   Bell, User, LogOut, Menu, X, ChevronDown,
   Home, Building2, Target, FileText, Calendar,
   Phone, Mail, DollarSign, PieChart, LineChart,
-  Cpu, Layers, Box, Code, HardDrive, Network
+  Cpu, Layers, Box, Code, HardDrive, Network,
+  Rocket
 } from "lucide-react"
 
 interface PortalLayoutProps {
@@ -27,23 +28,20 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
   const [activeSection, setActiveSection] = useState('overview')
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
 
-  // Auto-expand CRM menu if on CRM pages
+  // Auto-expand menus based on current path
   useEffect(() => {
-    if (pathname.startsWith('/portal/crm')) {
-      setActiveSection('crm')
-      if (!expandedMenus.includes('crm')) {
-        setExpandedMenus(prev => [...prev, 'crm'])
-      }
-    } else if (pathname === '/portal') {
+    if (pathname === '/portal') {
       setActiveSection('overview')
+    } else if (pathname.startsWith('/portal/dashboard')) {
+      setActiveSection('dashboard')
     } else if (pathname.startsWith('/portal/website')) {
       setActiveSection('website')
+    } else if (pathname.startsWith('/portal/crm')) {
+      setActiveSection('crm')
     } else if (pathname.startsWith('/portal/analytics')) {
       setActiveSection('analytics')
     } else if (pathname.startsWith('/portal/customize')) {
       setActiveSection('customize')
-    } else if (pathname.startsWith('/portal/integrations')) {
-      setActiveSection('integrations')
     } else if (pathname.startsWith('/portal/settings')) {
       setActiveSection('settings')
     }
@@ -57,6 +55,12 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       href: '/portal'
     },
     {
+      id: 'dashboard',
+      name: 'Dashboard',
+      icon: BarChart3,
+      href: '/portal/dashboard'
+    },
+    {
       id: 'website',
       name: 'Website',
       icon: Globe,
@@ -66,15 +70,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       id: 'crm',
       name: 'CRM',
       icon: Users,
-      href: '/portal/crm',
-      submenu: [
-        { name: 'Overview', href: '/portal/crm' },
-        { name: 'Contacts', href: '/portal/crm/contacts' },
-        { name: 'Deals', href: '/portal/crm/deals' },
-        { name: 'Activities', href: '/portal/crm/activities' },
-        { name: 'Companies', href: '/portal/crm/companies' },
-        { name: 'Reports', href: '/portal/crm/reports' }
-      ]
+      href: '/portal/crm'
     },
     {
       id: 'analytics',
@@ -90,12 +86,6 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       name: 'Customize',
       icon: Palette,
       href: '/portal/customize'
-    },
-    {
-      id: 'integrations',
-      name: 'Integrations',
-      icon: Network,
-      href: '/portal/integrations'
     },
     {
       id: 'settings',
@@ -125,26 +115,26 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
 
   return (
     <ChatbotProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-900">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-700">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                 <Cpu className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Zenith</h1>
-                <p className="text-xs text-gray-500">Business Platform</p>
+                <h1 className="text-lg font-semibold text-white">Zenith</h1>
+                <p className="text-xs text-gray-400">Business Platform</p>
               </div>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 text-gray-400 hover:text-gray-600"
+              className="lg:hidden p-1 text-gray-400 hover:text-gray-300"
             >
               <X className="w-5 h-5" />
             </button>
@@ -154,51 +144,26 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
           <nav className="flex-1 px-4 py-6 space-y-8">
             {/* Main Modules */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Main Modules
               </h3>
               <div className="space-y-1">
                 {mainModules.map((item) => {
                   const Icon = item.icon
-                  const isExpanded = expandedMenus.includes(item.id)
-                  const hasSubmenu = item.submenu && item.submenu.length > 0
                   
                   return (
                     <div key={item.id}>
                       <div
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                           activeSection === item.id
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'text-gray-700 hover:bg-gray-100'
+                            ? 'bg-purple-900/50 text-purple-300'
+                            : 'text-gray-300 hover:bg-gray-700'
                         }`}
-                        onClick={() => {
-                          if (hasSubmenu) {
-                            toggleMenu(item.id)
-                          } else {
-                            handleNavigation(item.href, item.id)
-                          }
-                        }}
+                        onClick={() => handleNavigation(item.href, item.id)}
                       >
                         <Icon className="w-5 h-5" />
                         <span className="flex-1">{item.name}</span>
-                        {hasSubmenu && (
-                          <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        )}
                       </div>
-                      
-                      {hasSubmenu && isExpanded && (
-                        <div className="ml-6 mt-1 space-y-1">
-                          {item.submenu.map((subItem, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleNavigation(subItem.href, item.id)}
-                              className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                              {subItem.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   )
                 })}
@@ -207,7 +172,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
 
             {/* System Modules */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 System
               </h3>
               <div className="space-y-1">
@@ -219,8 +184,8 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
                       onClick={() => handleNavigation(item.href, item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left ${
                         activeSection === item.id
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-purple-900/50 text-purple-300'
+                          : 'text-gray-300 hover:bg-gray-700'
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -233,23 +198,23 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
           </nav>
 
           {/* User Profile */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-700">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-white truncate">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-gray-400 truncate">
                   {user?.email}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Logout
@@ -261,28 +226,28 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Top Header - Sticky */}
-        <header className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
+        <header className="sticky top-0 z-30 bg-gray-800 shadow-sm border-b border-gray-700">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 text-gray-400 hover:text-gray-600"
+                className="lg:hidden p-2 text-gray-400 hover:text-gray-300"
               >
                 <Menu className="w-5 h-5" />
               </button>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-white">
                   {mainModules.find(item => item.id === activeSection)?.name || 'Portal'}
                 </h2>
-                <p className="text-sm text-gray-500 capitalize">
+                <p className="text-sm text-gray-400 capitalize">
                   {user?.tenant.industry} • {user?.tenant.name}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 rounded-full">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-green-700 font-medium">System Ready</span>
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-900/50 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm text-green-300 font-medium">System Ready</span>
               </div>
             </div>
           </div>
@@ -301,7 +266,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+          className="fixed inset-0 z-40 bg-gray-900 bg-opacity-75 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
