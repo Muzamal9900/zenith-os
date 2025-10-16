@@ -39,11 +39,11 @@ export default function Home() {
         <HeroSection />
         <ProblemSection />
         <OperatingSystemSection />
-        <InteractiveOSDemo />
-        <CRMDemo />
+        <InteractiveOSDemo /> 
+        {/* <CRMDemo /> */}
         <ThreeModules />
         <ClientPathways />
-        <WhiteLabelShowcase />
+        {/* <WhiteLabelShowcase /> */}
         <TechnicalExcellence />
         <CTASection />
       </main>
